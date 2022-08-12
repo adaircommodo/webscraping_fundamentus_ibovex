@@ -32,22 +32,14 @@ class Ibovx:
                 for v in trs:
                     try:
                         td_data = v.find_all('td')[0].text
-                        td_variacao_perc = v.find_all('td')[1].text
-                        td_variacao = v.find_all('td')[2].text
-                        td_cotacao = v.find_all('td')[3].text
-                        td_abertura = v.find_all('td')[4].text
-                        td_min = v.find_all('td')[5].text
-                        td_max = v.find_all('td')[6].text
+                        td_variacao_perc = conv.strToFloat( conv.comaToPoint( v.find_all('td')[1].text ) ) if cont>0 else v.find_all('td')[1].text
+                        td_variacao = conv.strToFloat( conv.comaToPoint( v.find_all('td')[2].text ) ) if cont>0 else v.find_all('td')[2].text
+                        td_cotacao = conv.strToFloat( conv.comaToPoint( v.find_all('td')[3].text ) ) if cont>0 else v.find_all('td')[3].text
+                        td_abertura = conv.strToFloat( conv.comaToPoint( v.find_all('td')[4].text ) ) if cont>0 else v.find_all('td')[4].text
+                        td_min =  conv.strToFloat( conv.comaToPoint( v.find_all('td')[5].text) ) if cont>0 else v.find_all('td')[5].text
+                        td_max = conv.strToFloat( conv.comaToPoint( v.find_all('td')[6].text ) ) if cont>0 else v.find_all('td')[6].text
                         td_vol = v.find_all('td')[7].text
                         td_num_negocios = v.find_all('td')[8].text
-
-                        if cont>0:
-                            td_variacao_perc = conv.strToFloat( conv.comaToPoint( td_variacao_perc ) )
-                            td_variacao = conv.strToFloat( conv.comaToPoint( td_variacao ) )
-                            td_cotacao = conv.strToFloat( conv.comaToPoint( td_cotacao ) )
-                            td_abertura = conv.strToFloat( conv.comaToPoint( td_abertura ) )
-                            td_min = conv.strToFloat( conv.comaToPoint( td_min ) )
-                            td_max = conv.strToFloat( conv.comaToPoint( td_max ) )
                           
                         print(f'{td_data} | {td_variacao_perc} | {td_variacao} | {td_cotacao} | {td_abertura} | {td_min} | {td_max} | {td_vol} | {td_num_negocios}')
                     except IndexError: #não exibe banner de propaganda
