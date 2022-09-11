@@ -1,5 +1,4 @@
 import pandas as pd
-import csv
 import requests as rq
 from bs4 import BeautifulSoup
 #---
@@ -51,6 +50,17 @@ class Fundamentus:
 
 
     def outContentCsv(self, addIbvx = 0, **kwargs):
+        
+        pasta_destino = '.'
+        if('destino' in kwargs and kwargs['destino'] is not None):
+            pasta_destino = kwargs['destino'].strip()
+
+        nome = 'novo_arquivo'
+        if('nome' in kwargs and kwargs['nome'] is not None):
+            nome = kwargs['nome'].strip()
+
+        caminho_nome_final = pasta_destino+'/'+nome+'.csv'
+        
         dados = []
         ttFundos = len(self.fiis)
         ctFundo = 1
@@ -65,18 +75,23 @@ class Fundamentus:
 
             page = BeautifulSoup(target_page.text, 'html.parser')
             tables = page.find_all('table')
-            cotacao = conv.strToFloat( conv.comaToPoint( tables[0].find_all('td', attrs={'class':'data destaque w3'})[0].find('span').text ) )
+            cotacao = tables[0].find_all('td', attrs={'class':'data destaque w3'})[0].find('span').text
             segmento = tables[0].find_all('tr')[3].find_all('td', attrs={'class':'data'})[0].find('span').text
-            ffoyield = conv.strToFloat( conv.comaToPoint( tables[2].find_all('tr')[1].find_all('td', attrs={'class':'data'})[1].find('span').text ) )
-            divyield = conv.strToFloat( conv.comaToPoint( tables[2].find_all('tr')[2].find_all('td', attrs={'class':'data'})[1].find('span').text ) )
-            ppv = conv.strToFloat( conv.comaToPoint( tables[2].find_all('tr')[3].find_all('td', attrs={'class':'data'})[1].find('span').text ) )
-            vpcota = conv.strToFloat( conv.comaToPoint( tables[2].find_all('tr')[3].find_all('td', attrs={'class':'data'})[2].find('span').text ) )
+            ffoyield = tables[2].find_all('tr')[1].find_all('td', attrs={'class':'data'})[1].find('span').text
+            divyield = tables[2].find_all('tr')[2].find_all('td', attrs={'class':'data'})[1].find('span').text
+            ppv = tables[2].find_all('tr')[3].find_all('td', attrs={'class':'data'})[1].find('span').text
+            vpcota = tables[2].find_all('tr')[3].find_all('td', attrs={'class':'data'})[2].find('span').text
 
-            print(f'Lendo em fundamentus - ({ctFundo} de {ttFundos}) FUNDO: {fii}...\n')
+            print(f'Lendo em fundamentus - ({ctFundo} de {ttFundos}) FUNDO: {fii} ...')
             dados.append({'fundo':fii,'segmento':segmento, 'cotacao':cotacao, 'ffoyield':ffoyield, 'divyield':divyield, 'ppv':ppv, 'vpcota':vpcota})
             ctFundo = ctFundo+1
         
-        df = pd.DataFrame(dados)
-        print(df)
-        #df_out = pd.to_csv(dados)
+        print(f'Criando o arquivo: {caminho_nome_final}')
+        
+        try:
+            df = pd.DataFrame(dados)
+            df.to_csv(caminho_nome_final, sep=';', index=False, encoding='iso-8859-1')
+            print(f'Arquivo {caminho_nome_final} criado com sucesso!\n')
+        except:
+            print(f'Opsss... ocorreu um erro na geração do arquivo {caminho_nome_final}! #sorry\n')
             
